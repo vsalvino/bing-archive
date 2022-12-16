@@ -20,7 +20,10 @@
   <div class="col">
     <img src="{{root}}{{img.thumb_url}}" alt="">
     <p class="copy">{{img.data["ImageContent"]["Copyright"]}}</p>
-    <p><a rel="nofollow" href="{{root}}{{img.url}}">Download</a></p>
+    <p>
+      <a rel="nofollow" href="{{root}}{{img.url}}">Download</a>
+      ({{img.Image.width}}x{{img.Image.height}}) ({{img.filesize}} MB)
+    </p>
   </div>
 </div>
 {% endblock %}

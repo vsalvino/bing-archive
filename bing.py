@@ -79,9 +79,14 @@ class BingImage:
     def data(self) -> dict:
         return json.loads(self.data_path.read_text())
 
-    @property
+    @cached_property
     def Image(self):
         return Image.open(self.path)
+
+    @cached_property
+    def filesize(self) -> float:
+        """File size in MB."""
+        return round(self.path.stat().st_size / 1024 / 1024, 2)
 
     def write_thumbnail(self) -> None:
         if self.thumb_path.exists():

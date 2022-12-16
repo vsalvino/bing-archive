@@ -1,0 +1,3 @@
+# Disallow crawling of high-res images to reduce bandwidth consumption.
+User-agent: *
+Disallow: /images/
