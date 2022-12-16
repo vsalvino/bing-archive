@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block head %}
+<title>{{display_date}} - Bing Archiver</title>
+<meta property="og:title" content="{{display_date}} - Bing Archiver">
+{% endblock %}
+{% block body %}
+<h1>{{display_date}}</h1>
+<div class="row-4">
+  {% for i in imgs %}
+  <a class="col" href="{{root}}{{i.html_url}}">
+    <img src="{{root}}{{i.thumb_url}}" alt="">
+    <span>{{i.display_date}}</span>
+  </a>
+  {% endfor %}
+</div>
+<hr>
+<div class="row-2">
+  <div class="col">
+    {% if prev_img %}
+    <a href="{{prev_img.html_month_url}}">← {{prev_img.display_month}}</a>
+    {% endif %}
+  </div>
+  <div class="col text-right">
+    {% if next_img %}
+    <a href="{{next_img.html_month_url}}">{{next_img.display_month}} →</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

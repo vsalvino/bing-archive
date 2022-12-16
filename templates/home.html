@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block bg %}{{root}}{{img.thumb_url}}{% endblock %}
+{% block body %}
+<h1>Picture of the Day</h1>
+<div class="row-2">
+  <div class="col">
+    <h2>{{img.data["ImageContent"]["Title"]}}</h2>
+    <p>{{img.data["ImageContent"]["Description"]}}</p>
+    <p><a class="btn" href="{{root}}{{img.html_month_url}}">Browse all →</a></p>
+  </div>
+  <div class="col">
+    <img src="{{root}}{{img.thumb_url}}" alt="">
+    <p class="copy">{{img.data["ImageContent"]["Copyright"]}}</p>
+    <p><a rel="nofollow" href="{{root}}{{img.url}}">Download</a></p>
+  </div>
+</div>
+<hr>
+<h1>About the Bing Archiver</h1>
+<p>
+  This site archives Bing’s picture of the day by scraping and
+  downloading the publicly available high resolution file
+  from <a href="https://www.bing.com">bing.com</a>. Metadata such as
+  copyright and description are added to the image files, and are also
+  archived on this site.
+</p>
+<p>
+  Images are not for commercial use without explicit permission from
+  their authors.
+</p>
+<p>
+  <a href="https://github.com/vsalvino/bing-archive">github.com/vsalvino/bing-archive</a>
+</p>
+{% endblock %}

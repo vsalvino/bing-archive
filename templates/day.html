@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block head %}
+<title>{{img.display_date}} - Bing Archiver</title>
+<meta name="description" content="{{img.data['ImageContent']['Title']}}">
+<meta property="og:title" content="{{img.display_date}} - Bing Archiver">
+<meta property="og:image" content="{{root}}{{img.thumb_url}}">
+{% endblock %}
+{% block navbar %}
+<a href="{{root}}">Bing Archiver</a> /
+<a href="{{root}}{{img.html_month_url}}">{{img.display_month}}</a>
+{% endblock %}
+{% block bg %}{{root}}{{img.thumb_url}}{% endblock %}
+{% block body %}
+<h1>{{img.display_date}}</h1>
+<div class="row-2">
+  <div class="col">
+    <h2>{{img.data["ImageContent"]["Title"]}}</h2>
+    <p>{{img.data["ImageContent"]["Description"]}}</p>
+  </div>
+  <div class="col">
+    <img src="{{root}}{{img.thumb_url}}" alt="">
+    <p class="copy">{{img.data["ImageContent"]["Copyright"]}}</p>
+    <p><a rel="nofollow" href="{{root}}{{img.url}}">Download</a></p>
+  </div>
+</div>
+{% endblock %}

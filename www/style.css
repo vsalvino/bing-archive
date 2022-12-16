@@ -1,0 +1,87 @@
+body {
+    background-color: #666;
+    color:  rgba(255, 255, 255, 0.8);
+    font-family: system-ui, sans-serif;
+    margin: 0;
+}
+a {
+    color: #fff;
+}
+hr {
+    border: none;
+    border-bottom: 4px solid rgba(255, 255, 255, 0.2);
+    margin: 40px 0;
+}
+
+.bg {
+    background-position: center;
+    filter: blur(50px);
+    height: 100vh;
+    position: fixed;
+    width: 100vw;
+    z-index: -2;
+    background-size: cover;
+}
+.halo {
+    background-color: rgba(0, 0, 0, 0.7);
+    height: 100vh;
+    position: fixed;
+    width: 100vw;
+    z-index: -1;
+}
+.container {
+    margin: 0 auto;
+    max-width: 900px;
+    padding: 0 15px;
+}
+
+nav {
+    font-weight: bold;
+    padding: 20px 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+img {
+    border-radius: 8px;
+    display: block;
+    height: auto;
+    width: 100%;
+}
+.btn {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    color: #000;
+    display: inline-block;
+    font-weight: bold;
+    padding: 10px 16px;
+    text-decoration: none;
+}
+.btn:hover,
+.btn:focus {
+    background-color: #fff;
+}
+.copy {
+    font-size: 0.9em;
+    font-style: italic;
+    margin-top: 0;
+}
+.row-2 {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: auto auto;
+}
+.row-4 {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: auto auto auto auto;
+}
+.text-right {
+    text-align: right;
+}
+@media(max-width: 800px) {
+    .row-2 {
+        grid-template-columns: auto;
+    }
+    .row-4 {
+        grid-template-columns: auto auto;
+    }
+}

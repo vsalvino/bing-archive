@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="{{root}}style.css">
+    {% block head %}
+    <title>Bing Archiver</title>
+    <meta name="description" content="">
+    <meta property="og:title" content="Bing Archiver">
+    <meta property="og:image" content="">
+    {% endblock %}
+  </head>
+  <body>
+    <div class="bg" style="background-image:url('{% block bg %}{% endblock %}')"></div>
+    <div class="halo"></div>
+    <nav>
+      <div class="container">
+        {% block navbar %}
+        <a href="{{root}}">Bing Archiver</a>
+        {% endblock %}
+      </div>
+      </nav>
+    <main class="container">
+      {% block body %}{% endblock %}
+    </main>
+  </body>
+</html>
