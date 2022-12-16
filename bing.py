@@ -4,10 +4,6 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pathlib import Path
 from pathlib import PurePosixPath
-from typing import List
-from typing import Tuple
-from urllib.error import HTTPError
-from urllib.request import Request
 from urllib.request import urlopen
 from urllib.request import urlretrieve
 import argparse
@@ -15,6 +11,7 @@ import json
 import piexif
 import string
 import time
+import sys
 
 
 # -- Set up argparse ----------------------------------------------------------
@@ -35,7 +32,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-# -- Utilities ----------------------------------------------------------------
+# -- Globals ------------------------------------------------------------------
 
 
 # File paths.
@@ -86,45 +83,22 @@ class BingImage:
     def Image(self):
         return Image.open(self.path)
 
-    def write_thumbnail(self):
+    def write_thumbnail(self) -> None:
         if self.thumb_path.exists():
             return
         i = self.Image
         i.thumbnail((480, 480))
         i.save(self.thumb_path, quality=70)
 
-    def write_data(self, data: dict):
+    def write_data(self, data: dict) -> None:
         self.data_path.write_text(json.dumps(data), encoding="utf8")
-
-
-def request_json(url: str) -> Tuple[int, dict]:
-    """
-    Makes an HTTP request and parses the JSON response.
-    """
-    req = Request(
-        url,
-        headers={"Accept": "application/json"},
-    )
-
-    # Open the request and read the response.
-    code = 0
-    text = ""
-    try:
-        r = urlopen(req)
-        code = r.code
-        text = r.read().decode("utf8")
-    # Non-200 statuses can be read similarly.
-    except HTTPError as err:
-        code = err.code
-        text = err.read().decode("utf8")
-
-    return (code, json.loads(text))
 
 
 # -- Download images-----------------------------------------------------------
 
 
-code, bing = request_json("https://www.bing.com/hp/api/model")
+r = urlopen("https://www.bing.com/hp/api/model")
+bing = json.loads(r.read().decode("utf8"))
 
 for m in bing["MediaContents"]:
 
@@ -157,8 +131,6 @@ for m in bing["MediaContents"]:
 
 # If only downloading, exit.
 if args.download:
-    import sys
-
     sys.exit(0)
 
 
@@ -175,7 +147,7 @@ jenv = Environment(
 # Build the site by batching images into months, then generate pages
 # for each month.
 curr_date = None
-imgs: List[BingImage] = []
+imgs: list[BingImage] = []
 prev_month_img: BingImage = None
 for p in dir_img.iterdir():
 
@@ -209,7 +181,6 @@ for p in dir_img.iterdir():
             {
                 "root": "../../../",
                 "imgs": imgs,
-                "date": curr_date,
                 "display_date": imgs[-1].display_month,
                 "next_img": i,
                 "prev_img": prev_month_img,
@@ -229,8 +200,7 @@ out = jenv.get_template("month.html").render(
     {
         "root": "../../../",
         "imgs": imgs,
-        "date": curr_date,
-        "display_date": time.strftime("%B %Y", curr_date),
+        "display_date": imgs[-1].display_month,
         "prev_img": prev_month_img,
     }
 )
@@ -244,8 +214,6 @@ out = jenv.get_template("home.html").render(
     {
         "root": "",
         "img": imgs[-1],
-        "date": curr_date,
-        "display_date": time.strftime("%B %Y", curr_date),
     }
 )
 index_path.write_text(out, encoding="utf8")
