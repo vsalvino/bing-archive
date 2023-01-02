@@ -154,7 +154,7 @@ jenv = Environment(
 curr_date = None
 imgs: list[BingImage] = []
 prev_month_img: BingImage = None
-for p in dir_img.iterdir():
+for p in sorted(dir_img.iterdir()):
 
     i = BingImage(p)
 
@@ -194,7 +194,7 @@ for p in dir_img.iterdir():
         imgs[-1].html_month_path.parent.mkdir(parents=True, exist_ok=True)
         imgs[-1].html_month_path.write_text(out, encoding="utf8")
         # Reset.
-        curr_date = img_date
+        curr_date = i.date
         prev_month_img = imgs[-1]
         imgs = []
         imgs.append(i)

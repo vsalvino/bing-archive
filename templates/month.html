@@ -17,12 +17,12 @@
 <div class="row-2">
   <div class="col">
     {% if prev_img %}
-    <a href="{{prev_img.html_month_url}}">← {{prev_img.display_month}}</a>
+    <a href="{{root}}{{prev_img.html_month_url}}">← {{prev_img.display_month}}</a>
     {% endif %}
   </div>
   <div class="col text-right">
     {% if next_img %}
-    <a href="{{next_img.html_month_url}}">{{next_img.display_month}} →</a>
+    <a href="{{root}}{{next_img.html_month_url}}">{{next_img.display_month}} →</a>
     {% endif %}
   </div>
 </div>
