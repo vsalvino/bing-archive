@@ -80,12 +80,18 @@ class BingImage:
         return piexif.load(str(self.path))
 
     @cached_property
-    def title(self):
-        return self.exif["0th"][piexif.ImageIFD.ImageDescription].decode("latin1")
+    def title(self) -> str:
+        try:
+            return self.exif["0th"][piexif.ImageIFD.ImageDescription].decode("latin1")
+        except KeyError:
+            return ""
 
     @cached_property
-    def copyright(self):
-        return self.exif["0th"][piexif.ImageIFD.Copyright].decode("latin1")
+    def copyright(self) -> str:
+        try:
+            return self.exif["0th"][piexif.ImageIFD.Copyright].decode("latin1")
+        except KeyError:
+            return ""
 
     @cached_property
     def filesize(self) -> float:
