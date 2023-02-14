@@ -2,21 +2,15 @@
 {% block bg %}{{root}}{{img.thumb_url}}{% endblock %}
 {% block body %}
 <h1>Picture of the Day</h1>
-<div class="row-2">
-  <div class="col">
-    <h2>{{img.data["ImageContent"]["Title"]}}</h2>
-    <p>{{img.data["ImageContent"]["Description"]}}</p>
-    <p><a class="btn" href="{{root}}{{img.html_month_url}}">Browse all →</a></p>
-  </div>
-  <div class="col">
-    <img src="{{root}}{{img.thumb_url}}" alt="">
-    <p class="copy">{{img.data["ImageContent"]["Copyright"]}}</p>
-    <p>
-      <a rel="nofollow" href="{{root}}{{img.url}}">Download</a>
-      ({{img.Image.width}}x{{img.Image.height}}) ({{img.filesize}} MB)
-    </p>
-  </div>
-</div>
+<h2>{{img.title}}</h2>
+<img src="{{root}}{{img.thumb_url}}" alt="">
+<p class="copy">{{img.copyright}}</p>
+<p>
+  <a rel="nofollow" href="{{root}}{{img.url}}">Download</a>
+  ({{img.Image.width}}x{{img.Image.height}}) ({{img.filesize}} MB)
+</p>
+<hr>
+<p><a class="btn" href="{{root}}{{img.html_month_url}}">Browse all →</a></p>
 <hr>
 <h1>About the Bing Archiver</h1>
 <p>

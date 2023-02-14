@@ -4,14 +4,14 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from pathlib import Path
 from pathlib import PurePosixPath
+from urllib.request import Request
 from urllib.request import urlopen
 from urllib.request import urlretrieve
 import argparse
-import json
 import piexif
-import string
 import time
 import sys
+import xml.etree.ElementTree
 
 
 # -- Set up argparse ----------------------------------------------------------
@@ -40,16 +40,13 @@ if args.download:
     dir_www = args.download
     dir_img = args.download
     dir_thumbs = args.download
-    dir_data = args.download
 else:
     dir_www = Path("www")
     dir_img = dir_www / "images"
     dir_thumbs = dir_www / "thumbs"
-    dir_data = dir_www / "data"
 dir_www.mkdir(parents=True, exist_ok=True)
 dir_img.mkdir(parents=True, exist_ok=True)
 dir_thumbs.mkdir(parents=True, exist_ok=True)
-dir_data.mkdir(parents=True, exist_ok=True)
 dir_tmpl = Path("templates")
 
 
@@ -61,7 +58,6 @@ class BingImage:
         self.display_month = time.strftime("%B %Y", self.date)
         self.thumb_path = dir_thumbs / f"{self.path.stem}.webp"
         self.thumb_url = PurePosixPath(self.thumb_path.relative_to(dir_www))
-        self.data_path = dir_data / f"{self.path.stem}.json"
         self.html_path = (
             dir_www
             / str(self.date.tm_year)
@@ -76,12 +72,20 @@ class BingImage:
         self.html_month_url = PurePosixPath(self.html_month_path.relative_to(dir_www))
 
     @cached_property
-    def data(self) -> dict:
-        return json.loads(self.data_path.read_text())
-
-    @cached_property
     def Image(self):
         return Image.open(self.path)
+
+    @cached_property
+    def exif(self):
+        return piexif.load(str(self.path))
+
+    @cached_property
+    def title(self):
+        return self.exif["0th"][piexif.ImageIFD.ImageDescription].decode("latin1")
+
+    @cached_property
+    def copyright(self):
+        return self.exif["0th"][piexif.ImageIFD.Copyright].decode("latin1")
 
     @cached_property
     def filesize(self) -> float:
@@ -95,44 +99,62 @@ class BingImage:
         i.thumbnail((480, 480))
         i.save(self.thumb_path, quality=70)
 
-    def write_data(self, data: dict) -> None:
-        self.data_path.write_text(json.dumps(data), encoding="utf8")
-
 
 # -- Download images-----------------------------------------------------------
 
 
-r = urlopen("https://www.bing.com/hp/api/model")
-bing = json.loads(r.read().decode("utf8"))
+# # Using json API from bing homepage...
+# r = urlopen("https://www.bing.com/hp/api/model")
+# bing = json.loads(r.read().decode("utf8"))
+# for m in bing["MediaContents"]:
 
-for m in bing["MediaContents"]:
+#     # Parse date.
+#     date_struct = time.strptime(m["FullDateString"], "%b %d, %Y")
+#     date = time.strftime("%Y%m%d", date_struct)
+
+#     # Get image URL and replace size with UHD size parameter.
+#     ic = m["ImageContent"]
+#     url = "https://www.bing.com" + ic["Image"]["Url"]
+#     url = url.replace("1920x1080.jpg", "UHD.jpg")
+
+#     # Get title and copyright.
+#     ic_desc = ic["Title"]
+#     ic_copy = ic["Copyright"]
+
+
+# Using XML archive API (which seems more stable)...
+r = urlopen("http://www.bing.com/HPImageArchive.aspx?format=xml&idx=0&n=8")
+bing = xml.etree.ElementTree.fromstring(r.read().decode("utf8"))
+for ic in bing:
+
+    if ic.tag != "image":
+        continue
 
     # Parse date.
-    date_struct = time.strptime(m["FullDateString"], "%b %d, %Y")
+    date_struct = time.strptime(ic.find("startdate").text, "%Y%m%d")
     date = time.strftime("%Y%m%d", date_struct)
 
-    i = BingImage(dir_img / f"{date}.jpg")
-
     # Get image URL and replace size with UHD size parameter.
-    ic = m["ImageContent"]
-    url = "https://www.bing.com" + ic["Image"]["Url"]
+    url = "https://www.bing.com" + ic.find("url").text
     url = url.replace("1920x1080.jpg", "UHD.jpg")
+
+    # Get title and copyright.
+    ic_desc = ic.find("copyright").text.split("©")[0].strip("() ")
+    ic_copy = "©" + ic.find("copyright").text.split("©")[1].strip("() ")
+
+    i = BingImage(dir_img / f"{date}.jpg")
     if not i.path.exists():
         # Download image.
-        print(f"Download {i.path}")
+        print(f"Downloading '{url}' to {i.path}")
         urlretrieve(url, filename=i.path)
         # Write metadata as EXIF tags.
         exif_dict = {
             "0th": {
-                piexif.ImageIFD.ImageDescription: ic["Title"],
-                piexif.ImageIFD.Copyright: ic["Copyright"],
+                piexif.ImageIFD.ImageDescription: ic_desc,
+                piexif.ImageIFD.Copyright: ic_copy,
             }
         }
         i.Image.save(i.path, quality="keep", exif=piexif.dump(exif_dict))
-
-    if not args.download and not i.data_path.exists():
-        # Write json to file.
-        i.write_data(m)
 
 # If only downloading, exit.
 if args.download:
