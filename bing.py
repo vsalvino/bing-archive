@@ -96,7 +96,7 @@ class BingImage:
         if self.thumb_path.exists():
             return
         i = self.Image
-        i.thumbnail((480, 480))
+        i.thumbnail((720, 720))
         i.save(self.thumb_path, quality=70)
 
 
