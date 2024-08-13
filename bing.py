@@ -71,7 +71,7 @@ class BingImage:
         self.html_url = PurePosixPath(self.html_path.relative_to(dir_www))
         self.html_month_url = PurePosixPath(self.html_month_path.relative_to(dir_www))
 
-    @cached_property
+    @property
     def Image(self):
         return Image.open(self.path)
 
@@ -82,6 +82,8 @@ class BingImage:
     @cached_property
     def title(self) -> str:
         try:
+            return self.exif["0th"][piexif.ImageIFD.ImageDescription].decode("utf8")
+        except UnicodeDecodeError:
             return self.exif["0th"][piexif.ImageIFD.ImageDescription].decode("latin1")
         except KeyError:
             return ""
@@ -89,6 +91,8 @@ class BingImage:
     @cached_property
     def copyright(self) -> str:
         try:
+            return self.exif["0th"][piexif.ImageIFD.Copyright].decode("utf8")
+        except UnicodeDecodeError:
             return self.exif["0th"][piexif.ImageIFD.Copyright].decode("latin1")
         except KeyError:
             return ""
@@ -102,8 +106,8 @@ class BingImage:
         if self.thumb_path.exists():
             return
         i = self.Image
-        i.thumbnail((720, 720))
-        i.save(self.thumb_path, quality=70)
+        i.thumbnail((900, 900))
+        i.save(self.thumb_path, quality=80)
 
 
 # -- Download images-----------------------------------------------------------
@@ -156,8 +160,8 @@ for ic in bing:
         # Write metadata as EXIF tags.
         exif_dict = {
             "0th": {
-                piexif.ImageIFD.ImageDescription: ic_desc,
-                piexif.ImageIFD.Copyright: ic_copy,
+                piexif.ImageIFD.ImageDescription: ic_desc.encode("utf8"),
+                piexif.ImageIFD.Copyright: ic_copy.encode("utf8"),
             }
         }
         i.Image.save(i.path, quality="keep", exif=piexif.dump(exif_dict))
